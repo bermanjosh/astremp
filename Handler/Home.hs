@@ -1,39 +1,48 @@
-{-# LANGUAGE TupleSections, OverloadedStrings #-}
+{-# LANGUAGE TupleSections, OverloadedStrings, RecordWildCards #-}
 module Handler.Home where
 
 import Import
+import Data.Time.Clock (UTCTime, getCurrentTime)
+import Yesod.Form.Bootstrap3
 
--- This is a handler function for the GET request method on the HomeR
--- resource pattern. All of your resource patterns are defined in
--- config/routes
---
--- The majority of the code you will write in Yesod lives in these handler
--- functions. You can spread them across multiple files if you are so
--- inclined, or create a single monolithic file.
-getHomeR :: Handler Html
+
+getHomeR :: Handler TypedContent
 getHomeR = do
-    (formWidget, formEnctype) <- generateFormPost sampleForm
-    let submission = Nothing :: Maybe (FileInfo, Text)
-        handlerName = "getHomeR" :: Text
-    defaultLayout $ do
-        aDomId <- newIdent
-        setTitle "Welcome To Yesod!"
-        $(widgetFile "homepage")
+    rides <- runDB $ selectList [] [Desc RidesAdded]
+    ((res, widget), enctype) <- runFormPost ridesForm 
+    selectRep $ do 
+        provideRep $ defaultLayout $(widgetFile "homepage")
+        provideRep $ return $ toJSON rides
 
-postHomeR :: Handler Html
+
+postHomeR :: Handler ()
 postHomeR = do
-    ((result, formWidget), formEnctype) <- runFormPost sampleForm
-    let handlerName = "postHomeR" :: Text
-        submission = case result of
-            FormSuccess res -> Just res
-            _ -> Nothing
+    ((res, entryWidget), enctype) <- runFormPost ridesForm
+    case res of
+        FormSuccess ride -> do
+            _ <- runDB $ insert ride 
+            redirect HomeR
+        _ -> redirect HomeR
+        
+getRidesTableR :: Handler Html
+getRidesTableR = do
+    rides <- runDB $ selectList [] [Desc RidesAdded]
+    ((res, widget), enctype) <- runFormPost ridesForm 
+    return $ [shamlet|
+        $forall Entity _ ride <- rides
+            <tr>
+                <td> #{ridesName ride}
+                <td> #{ridesDest ride}
+                <td> #{ridesLeaving ride}
+                <td> #{ridesNumber ride}
+                <td> #{ridesSpots ride}
+|]
 
-    defaultLayout $ do
-        aDomId <- newIdent
-        setTitle "Welcome To Yesod!"
-        $(widgetFile "homepage")
-
-sampleForm :: Form (FileInfo, Text)
-sampleForm = renderDivs $ (,)
-    <$> fileAFormReq "Choose a file"
-    <*> areq textField "What's on the file?" Nothing
+ridesForm :: Form Rides
+ridesForm = renderBootstrap3 BootstrapInlineForm $ Rides
+    <$> areq textField (withPlaceholder "Name" $ bfs ("Name" :: Text)) Nothing
+    <*> areq textField (withPlaceholder "Destination" $ bfs ("Destination" :: Text)) Nothing
+    <*> areq textField (withPlaceholder "Phone" $ bfs ("Phone" :: Text)) Nothing
+    <*> areq textField (withPlaceholder "Leaving" $ bfs ("Leaving" :: Text)) Nothing
+    <*> areq intField (withPlaceholder "Number of spots" $ bfs ("Number of spots" :: Text)) Nothing
+    <*> lift (liftIO getCurrentTime)

@@ -1,5 +1,5 @@
 name:              astremp
-version:           0.0.0
+version:           0.0.0.1
 cabal-version:     >= 1.8
 build-type:        Simple
 
@@ -67,6 +67,7 @@ library
                  , monad-logger                  >= 0.3        && < 0.4
                  , fast-logger                   >= 2.1.4      && < 2.2
                  , wai-logger                    >= 2.1        && < 2.2
+                 , time
 
 executable         astremp
     if flag(library-only)

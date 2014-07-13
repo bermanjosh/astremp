@@ -38,4 +38,7 @@ Icon
 
 .cabal-sandbox/*
 dist/*
-
+static/tmp/*
+yesod-devel/*
+*.aes
+*.sqlite3
