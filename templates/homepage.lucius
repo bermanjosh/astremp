@@ -18,8 +18,16 @@ table,th,td {
     border: 0;
 }
 
+#main {
+  margin: 25px;
+  padding: 10px;
+  border-radius: 15px 15px 15px 15px;
+  -moz-border-radius: 15px 15px 15px 15px;
+  -webkit-border-radius: 15px 15px 15px 15px;
+  border: 1px solid #000000
+}
+
 body {
-  background: #FAFAFA;
   text-align: center
 }
 
