@@ -2,7 +2,7 @@
 module Handler.Home where
 
 import Import
-import Data.Time.Clock (UTCTime, getCurrentTime)
+import Data.Time.Clock (getCurrentTime)
 import Yesod.Form.Bootstrap3
 
 
@@ -17,7 +17,7 @@ getHomeR = do
 
 postHomeR :: Handler ()
 postHomeR = do
-    ((res, entryWidget), enctype) <- runFormPost ridesForm
+    ((res, _), _) <- runFormPost ridesForm
     case res of
         FormSuccess ride -> do
             _ <- runDB $ insert ride 
@@ -27,7 +27,7 @@ postHomeR = do
 getRidesTableR :: Handler Html
 getRidesTableR = do
     rides <- runDB $ selectList [] [Desc RidesAdded]
-    ((res, widget), enctype) <- runFormPost ridesForm 
+    ((_, _), _) <- runFormPost ridesForm 
     return $ [shamlet|
         $forall Entity _ ride <- rides
             <tr>
@@ -40,7 +40,7 @@ getRidesTableR = do
 
 ridesForm :: Form Rides
 ridesForm = renderBootstrap3 BootstrapInlineForm $ Rides
-              <$> areq textField (withPlaceholder (render MsgName) $ bfs ("Name" :: Text)) Nothing
+              <$> areq textField (withPlaceholder "Name" $ bfs ("Name" :: Text)) Nothing
               <*> areq textField (withPlaceholder "Destination" $ bfs ("Destination" :: Text)) Nothing
               <*> areq textField (withPlaceholder "Phone" $ bfs ("Phone" :: Text)) Nothing
               <*> areq textField (withPlaceholder "Leaving" $ bfs ("Leaving" :: Text)) Nothing
