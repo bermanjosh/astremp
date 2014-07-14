@@ -1,19 +1,26 @@
-<h1>Alon Shevut Tremp-Board (Beta)
+<h1>_{MsgTitle}
+
+<form action=@{LangR} method=post>
+            _{MsgSwitchLanguage}
+            <select name=lang>
+                <option value=en>English
+                <option value=he>Hebrew
+            <input type=submit value=_{MsgSwitch}>
   
 <form .form-inline role=form method=post enctype=#{enctype} #rides-form>
     ^{widget}
     <div>
-        <input type=submit value="Post Ride">
+        <input type=submit value="_{MsgPost}">
 $if null rides
     <p>No rides
 $else
     <table #ridesTable>
       <tr>
-        <th>Name
-        <th>Destination
-        <th>Time Leaving
-        <th>Phone
-        <th>Spots
+        <th>_{MsgName}
+        <th>_{MsgDestination}
+        <th>_{MsgLeaving}
+        <th>_{MsgPhone}
+        <th>_{MsgNumSpots}
         $forall Entity _ ride <- rides
             <tr>
                 <td> #{ridesName ride}

@@ -40,9 +40,10 @@ getRidesTableR = do
 
 ridesForm :: Form Rides
 ridesForm = renderBootstrap3 BootstrapInlineForm $ Rides
-    <$> areq textField (withPlaceholder "Name" $ bfs ("Name" :: Text)) Nothing
-    <*> areq textField (withPlaceholder "Destination" $ bfs ("Destination" :: Text)) Nothing
-    <*> areq textField (withPlaceholder "Phone" $ bfs ("Phone" :: Text)) Nothing
-    <*> areq textField (withPlaceholder "Leaving" $ bfs ("Leaving" :: Text)) Nothing
-    <*> areq intField (withPlaceholder "Number of spots" $ bfs ("Number of spots" :: Text)) Nothing
-    <*> lift (liftIO getCurrentTime)
+              <$> areq textField (withPlaceholder (render MsgName) $ bfs ("Name" :: Text)) Nothing
+              <*> areq textField (withPlaceholder "Destination" $ bfs ("Destination" :: Text)) Nothing
+              <*> areq textField (withPlaceholder "Phone" $ bfs ("Phone" :: Text)) Nothing
+              <*> areq textField (withPlaceholder "Leaving" $ bfs ("Leaving" :: Text)) Nothing
+              <*> areq intField (withPlaceholder "Number of spots" $ bfs ("Number of spots" :: Text)) Nothing
+              <*> lift (liftIO getCurrentTime)
+   
