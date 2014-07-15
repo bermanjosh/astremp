@@ -28,7 +28,9 @@ table,th,td {
 }
 
 body {
-  text-align: center
+  text-align: center;
+  background-color: #FFFFFF
+
 }
 
 h1 {

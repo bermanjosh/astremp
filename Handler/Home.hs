@@ -6,44 +6,29 @@ import Data.Time.Clock (getCurrentTime)
 import Yesod.Form.Bootstrap3
 
 
-getHomeR :: Handler TypedContent
+getHomeR :: Handler Html
 getHomeR = do
     rides <- runDB $ selectList [] [Desc RidesAdded]
-    ((res, widget), enctype) <- runFormPost ridesForm 
-    selectRep $ do 
-        provideRep $ defaultLayout $(widgetFile "homepage")
-        provideRep $ return $ toJSON rides
-
+    r <- getMessageRender 
+    ((res, widget), enctype) <- runFormPost (ridesForm (r MsgName) (r MsgDestination) (r MsgPhone) (r MsgLeaving) (r MsgNumSpots)) 
+    defaultLayout $(widgetFile "homepage") 
 
 postHomeR :: Handler ()
 postHomeR = do
-    ((res, _), _) <- runFormPost ridesForm
+    r <- getMessageRender 
+    ((res, _), _) <- runFormPost (ridesForm (r MsgName) (r MsgDestination) (r MsgPhone) (r MsgLeaving) (r MsgNumSpots)) 
     case res of
         FormSuccess ride -> do
             _ <- runDB $ insert ride 
             redirect HomeR
         _ -> redirect HomeR
         
-getRidesTableR :: Handler Html
-getRidesTableR = do
-    rides <- runDB $ selectList [] [Desc RidesAdded]
-    ((_, _), _) <- runFormPost ridesForm 
-    return $ [shamlet|
-        $forall Entity _ ride <- rides
-            <tr>
-                <td> #{ridesName ride}
-                <td> #{ridesDest ride}
-                <td> #{ridesLeaving ride}
-                <td> #{ridesNumber ride}
-                <td> #{ridesSpots ride}
-|]
-
-ridesForm :: Form Rides
-ridesForm = renderBootstrap3 BootstrapInlineForm $ Rides
-              <$> areq textField (withPlaceholder "Name" $ bfs ("Name" :: Text)) Nothing
-              <*> areq textField (withPlaceholder "Destination" $ bfs ("Destination" :: Text)) Nothing
-              <*> areq textField (withPlaceholder "Phone" $ bfs ("Phone" :: Text)) Nothing
-              <*> areq textField (withPlaceholder "Leaving" $ bfs ("Leaving" :: Text)) Nothing
-              <*> areq intField (withPlaceholder "Number of spots" $ bfs ("Number of spots" :: Text)) Nothing
+ridesForm :: Text -> Text -> Text -> Text -> Text -> Form Rides
+ridesForm name dest phone leaving sports = renderBootstrap3 BootstrapInlineForm $ Rides
+              <$> areq textField (withPlaceholder name $ bfs ("Name" :: Text)) Nothing
+              <*> areq textField (withPlaceholder dest $ bfs ("Destination" :: Text)) Nothing
+              <*> areq textField (withPlaceholder phone $ bfs ("Phone" :: Text)) Nothing
+              <*> areq textField (withPlaceholder leaving $ bfs ("Leaving" :: Text)) Nothing
+              <*> areq intField (withPlaceholder sports $ bfs ("Number of spots" :: Text)) Nothing
               <*> lift (liftIO getCurrentTime)
    
