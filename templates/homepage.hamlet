@@ -4,7 +4,7 @@
             _{MsgSwitchLanguage}
             <select name=lang>
                 <option value=en>English
-                <option value=he>Hebrew
+                <option value=he>עברית
             <input type=submit value=_{MsgSwitch}>
   
 <form .form-inline role=form method=post enctype=#{enctype} #rides-form>
